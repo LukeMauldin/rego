@@ -3,43 +3,54 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"html/template"
-	"log"
 	"net/http"
-	"os"
 	"regexp"
 	"strconv"
+	"time"
+
+	"appengine"
+	"appengine/datastore"
 )
 
+// MatchResultResponse is a json type
 type MatchResultResponse struct {
 	Matches    [][]string `json:"matches"`
 	GroupsName []string   `json:"groupsName"`
 }
 
-func handler(rw http.ResponseWriter, req *http.Request) {
-	t, _ := template.ParseFiles("index.html")
-	t.Execute(rw, nil)
+type RegexStats struct {
+	RegexLength      int
+	TestStringLength int
+	MatchDuration    time.Duration
 }
 
 func regExpHandler(rw http.ResponseWriter, req *http.Request) {
+	ctx := appengine.NewContext(req)
+
 	var matches [][]string
 
-	req.ParseForm()
+	err := req.ParseForm()
+	if err != nil {
+		ctx.Errorf("Error parsing form: %v", err)
+		http.Error(rw, "Error parsing form", http.StatusInternalServerError)
+		return
+	}
 	regexpString := req.FormValue("regexp")
 	testString := req.FormValue("testString")
 	findAllSubmatch, _ := strconv.ParseBool(req.FormValue("findAllSubmatch"))
 
-	log.Printf("Regexp : %s", regexpString)
-	log.Printf("Test string : %s", testString)
-	log.Printf("Find all : %t", findAllSubmatch)
+	//log.Printf("Regexp : %s", regexpString)
+	//log.Printf("Test string : %s", testString)
+	//log.Printf("Find all : %t", findAllSubmatch)
+
+	startRegex := time.Now()
 
 	m := &MatchResultResponse{}
 
 	r, err := regexp.Compile(regexpString)
 	if err != nil {
-		log.Printf("Invalid RegExp : %s \n", regexpString)
-		rw.WriteHeader(500)
-		fmt.Fprintf(rw, "Invalid RegExp : %s", regexpString)
+		ctx.Errorf("Invalid RegExp : %s \n", regexpString)
+		http.Error(rw, fmt.Sprintf("Invalid RegExp : %s", regexpString), http.StatusInternalServerError)
 		return
 	}
 
@@ -49,33 +60,42 @@ func regExpHandler(rw http.ResponseWriter, req *http.Request) {
 		matches = [][]string{r.FindStringSubmatch(testString)}
 	}
 
-	log.Println(matches)
+	//log.Println(matches)
 
 	if len(matches) > 0 {
 		m.Matches = matches
 		m.GroupsName = r.SubexpNames()[1:]
 	}
 
+	regexDuration := time.Since(startRegex)
+	ctx.Infof("regex duration: %v", regexDuration)
+	stats := &RegexStats{
+		RegexLength:      len(regexpString),
+		TestStringLength: len(testString),
+		MatchDuration:    regexDuration,
+	}
+	writeStatsEntry(ctx, stats)
+
 	enc := json.NewEncoder(rw)
-	enc.Encode(m)
+	err = enc.Encode(m)
+	if err != nil {
+		ctx.Errorf("JSON encoding err: %v", err)
+		http.Error(rw, "JSON encoding error", http.StatusInternalServerError)
+		return
+	}
 }
 
-func main() {
+func writeStatsEntry(ctx appengine.Context, stats *RegexStats) {
+	_, err := datastore.Put(ctx, datastore.NewIncompleteKey(ctx, "regex_stats", nil), stats)
+	if err != nil {
+		ctx.Errorf("Error writing stats: %v", err)
+	}
+}
+
+func init() {
 	// Main handler (index.html)
-	http.HandleFunc("/", handler)
+	http.Handle("/", http.RedirectHandler("/assets/html/index.html", http.StatusMovedPermanently))
+
 	// Regex testing service
 	http.HandleFunc("/test_regexp/", regExpHandler)
-	// Static file serving
-	http.Handle("/assets/", http.StripPrefix("/assets/", http.FileServer(http.Dir("assets"))))
-
-	port := os.Getenv("PORT")
-	if port == "" {
-		port = "3000"
-	}
-
-	// Launch server
-	err := http.ListenAndServe(":"+port, nil)
-	if err != nil {
-		log.Fatal(err)
-	}
 }
