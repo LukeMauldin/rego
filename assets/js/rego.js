@@ -3,6 +3,7 @@
 jQuery.fn.input=function(a){var b=this;return a?b.bind({'input.input':function(c){b.unbind('keydown.input');a.call(this,c)},'keydown.input':function(c){a.call(this,c)}}):b.trigger('keydown.input')};
 
 $(document).ready(function() {
+    "use strict";
   var testRegexTimeout;
 
   function testRegex () {
@@ -10,9 +11,9 @@ $(document).ready(function() {
       type: "POST",
         url: "/test_regexp/",
       data: {
-        regexp: $("#regexpInput").val()
-        , testString: $("#testStringInput").val()
-        , findAllSubmatch: $("#findAllSubmatchCheckbox").is(":checked")
+        regexp: $("#regexpInput").val(),
+        testString: $("#testStringInput").val(),
+        findAllSubmatch: $("#findAllSubmatchCheckbox").is(":checked")
       }
     }).done(function(msg) {
       var res = $.parseJSON(msg);
@@ -22,12 +23,12 @@ $(document).ready(function() {
       // We clear previous results
       clearResults();
 
-      if (allMatches && allMatches[0] != null)
+      if (allMatches && allMatches[0] !== null)
       {
         var l = allMatches.length;
 
         // Match font color > green
-        $("#match").css("color", "green")
+        $("#match").css("color", "green");
 
         // Match groups
         if (l > 0)
@@ -44,24 +45,24 @@ $(document).ready(function() {
             match.push(matches[0]);
             for (var j = 1; j < m; j++)
             {
-              matchGroupsTable.push('<tr><td>'+(index++)+'</td><td>'+((groupsName[j-1] != "") ? groupsName[j-1] : "-")+'</td><td>'+escapeHTML(matches[j])+'</td></tr>');
+              matchGroupsTable.push('<tr><td>'+(index++)+'</td><td>'+((groupsName[j-1] !== "") ? groupsName[j-1] : "-")+'</td><td>'+escapeHTML(matches[j])+'</td></tr>');
             }
           }
 
-          $("#match").html(escapeHTML(match.join(" ")))
+          $("#match").html(escapeHTML(match.join(" ")));
           $('#matchGroupsTable > tbody:last').append(matchGroupsTable.join());
         }
 
       }
       else
       {
-        $("#match").html("No match !")
-        $("#match").css("color", "red")
+        $("#match").html("No match !");
+        $("#match").css("color", "red");
       }
 
     }).error(function(error) {
-      $("#match").html(error.responseText)
-      $("#match").css("color", "red")
+      $("#match").html(error.responseText);
+      $("#match").css("color", "red");
     });
   }
 
@@ -80,14 +81,14 @@ $(document).ready(function() {
     // Empty match groups table
     $("#matchGroupsTable tbody > tr").remove();
 
-    $("#match").html("")
+    $("#match").html("");
   }
 
   function escapeHTML(str) {
     var div = document.createElement('div');
     div.appendChild(document.createTextNode(str));
     return div.innerHTML;
-  };
+  }
 
   //
   // Add Handlers
@@ -101,14 +102,14 @@ $(document).ready(function() {
   $("#regexpForm").input(function() {
 
     if (testRegexTimeout)
-      clearTimeout(testRegexTimeout)
+      clearTimeout(testRegexTimeout);
 
-    testRegexTimeout = setTimeout(testRegex, 750)
+    testRegexTimeout = setTimeout(testRegex, 750);
   });
 
   $("#findAllSubmatchCheckbox").click(function() {
     testRegex();
-  })
+    });
 
   $("#clearAllFieldsButton").click(function() {
     clear();

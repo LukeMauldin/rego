@@ -8,7 +8,7 @@
     <meta name="author" content="Steve Domin">
 
   <!-- CSS -->
-    <link href="/assets/css/bootstrap.min.css" rel="stylesheet">
+    <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css" rel="stylesheet">
     <style type="text/css">
 
     /* Sticky footer styles
@@ -53,7 +53,6 @@
       margin-bottom: 20px;
     }
   </style>
-  <link href="/assets/css/bootstrap-responsive.min.css" rel="stylesheet">
   <!-- rego CSS -->
   <link href="/assets/css/rego.css" rel="stylesheet" media="screen">
 
@@ -78,8 +77,8 @@
         <h1>Rego</h1>
         A <a href="http://golang.org" target="_blank"/>Go</a> regular expression tester
       </div>
-      <div class="row-fluid">
-        <form id="regexpForm" action="/test_regexp" method="POST" class="span6">
+      <div class="row">
+        <form id="regexpForm" action="/test_regexp" method="POST" class="col-md-6">
           <label>Your regular expression :</label>
           <input id="regexpInput" type="text" placeholder="r([a-z]+)go" value="r([a-z]+)go" />
 
@@ -92,7 +91,7 @@
 
           <button id="clearAllFieldsButton" class="btn btn-warning" type="button">Clear all fields</button>
         </form>
-        <form class="span6">
+        <form class="col-md-6">
           <label>Match :</label>
           <div id="match" class="well">
           </div>
@@ -111,7 +110,7 @@
           </table>
         </form>
       </div>
-      <div class="row-fluid">
+      <div class="row">
         <div id="quickref" class="well">
           <h3>Go RegExp Quick Reference (<a href="http://rubular.com/" target="_blank">&#0169; Rubular</a>)</h3>
           <div style="float:left">
@@ -252,7 +251,7 @@
 
   <div id="footer">
     <div class="container">
-      <p class="muted credit">Built by <a href="https://github.com/stevedomin" target="_blank">Steve Domin</a>. Inspired by <a href="http://rubular.com/" target="_blank">Rubular</a> and <a href="https://regoio.herokuapp.com/" target="_blank"> Rego</a>. You can find the sources at <a href="https://github.com/lukemauldin/rego" target="_blank">github.com/lukemauldin/rego</a>.</p>
+      <p class="muted credit">Built by <a href="https://github.com/lukemauldin" target="_blank">Luke Mauldin</a>. Inspired by <a href="http://rubular.com/" target="_blank">Rubular</a> and <a href="https://regoio.herokuapp.com/" target="_blank"> Rego</a>. You can find the sources at <a href="https://github.com/lukemauldin/rego" target="_blank">github.com/lukemauldin/rego</a>.</p>
     </div>
   </div>
 
@@ -260,7 +259,7 @@
   <!-- Le javascript
     ================================================== -->
     <!-- Placed at the end of the document so the pages load faster -->
-    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
   <script type="text/javascript" src="/assets/js/rego.js"></script>
 
   <script type="text/javascript">
