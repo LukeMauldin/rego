@@ -6,6 +6,8 @@ api_version: go1
 handlers:
 - url: /assets
   static_dir: assets
+  secure: always
 
 - url: /.*
   script: _go_app
+  secure: always
