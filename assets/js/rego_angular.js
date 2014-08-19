@@ -1,4 +1,4 @@
-//(function() {
+(function() {
 
     'use strict';
 
@@ -73,4 +73,4 @@
         $scope.evaluateRegex();
     }]);
 
-//})();
+})();
