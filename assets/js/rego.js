@@ -75,12 +75,7 @@
                     $scope.error = data;
                 });
         };
-
-        //Watch for changes
-        $scope.$watch('regexpInput', $scope.evaluateRegex);
-        $scope.$watch('stringInput', $scope.evaluateRegex);
-        $scope.$watch('findAllSubmatch', $scope.evaluateRegex);
-
+        
         //Invoke evaluateRegex to display initial data to user
         $scope.evaluateRegex();
     }]);
