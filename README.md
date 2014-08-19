@@ -1,7 +1,7 @@
-rego
+Regex-Golang
 ====
 
-Rego is an online Go regular expression tester
+Regex-Golang is an online Go regular expression tester
 
 Inspired by [rubular](http://rubular.com/) and [regoio](https://regoio.herokuapp.com/).
 

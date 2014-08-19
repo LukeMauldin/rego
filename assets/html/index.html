@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<html>
+<html ng-app="regoApp">
 <head>
   <meta charset="utf-8">
     <title>Rego - A Go regular expression tester</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Rego - A Go regular expression tester">
-    <meta name="author" content="Steve Domin">
+    <meta name="author" content="Luke Mauldin">
 
   <!-- CSS -->
     <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css" rel="stylesheet">
@@ -68,7 +68,7 @@
   <link rel="apple-touch-icon-precomposed" sizes="72x72" href="/assets/ico/apple-touch-icon-72-precomposed.png">
   <link rel="apple-touch-icon-precomposed" href="/assets/ico/apple-touch-icon-57-precomposed.png">
 </head>
-<body>
+<body ng-controller="mainCtrl">
   <!-- Part 1: Wrap all page content here -->
     <div id="wrap">
     <!-- Begin page content -->
@@ -80,13 +80,13 @@
       <div class="row">
         <form id="regexpForm" action="/test_regexp" method="POST" class="col-md-6">
           <label>Your regular expression :</label>
-          <input id="regexpInput" type="text" placeholder="r([a-z]+)go" value="r([a-z]+)go" />
+          <input id="regexpInput" ng-model="regexpInput" ng-keyup="evaluateRegex()" type="text" value="r([a-z]+)go" />
 
           <label>Test string :</label>
-          <textarea id="testStringInput" rows="5" cols="20" placeholder="rego">rego</textarea>
+          <textarea id="testStringInput" ng-model="stringInput" ng-keyup="evaluateRegex()" rows="5" cols="20" placeholder="rego">rego</textarea>
 
           <label class="checkbox">
-            <input id="findAllSubmatchCheckbox" type="checkbox"> Find all submatch
+            <input id="findAllSubmatchCheckbox" ng-model="findAllSubmatch" ng-change="evaluateRegex()" type="checkbox" ng-true-value="true" ng-false-value="false"> Find all submatch
           </label>
 
           <button id="clearAllFieldsButton" class="btn btn-warning" type="button">Clear all fields</button>
@@ -94,6 +94,12 @@
         <form class="col-md-6">
           <label>Match :</label>
           <div id="match" class="well">
+              <div ng-show="error !== ''">
+                  <span class="danger">{{ error }}</span>
+              </div>
+              <div ng-show="error === ''">
+                  <span style="color: green">{{ matchResult }}</span>
+              </div>
           </div>
 
           <label>Match groups :</label>
@@ -106,6 +112,17 @@
               </tr>
             </thead>
             <tbody>
+                <tr ng-repeat="match in matches">
+                    <td>
+                        {{ match.count }}
+                    </td>
+                    <td>
+                        {{ match.groupName }}
+                    </td>
+                    <td>
+                        {{ match.matchText }}
+                    </td>
+                </tr>
             </tbody>
           </table>
         </form>
@@ -259,8 +276,8 @@
   <!-- Le javascript
     ================================================== -->
     <!-- Placed at the end of the document so the pages load faster -->
-    <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
-  <script type="text/javascript" src="/assets/js/rego.js"></script>
+     <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.2.22/angular.min.js"></script>
+  <script type="text/javascript" src="/assets/js/rego_angular.js"></script>
 
 <script>
   (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){

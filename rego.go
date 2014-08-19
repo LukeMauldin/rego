@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"net/http"
 	"regexp"
-	"strconv"
 	"time"
 
 	"appengine"
@@ -20,48 +19,42 @@ type MatchResultResponse struct {
 
 type RegexStats struct {
 	RegexLength      int
-	TestStringLength int
+	TextStringLength int
 	MatchDuration    time.Duration
 }
 
 func regExpHandler(rw http.ResponseWriter, req *http.Request) {
 	ctx := appengine.NewContext(req)
 
-	var matches [][]string
+	inputData := struct {
+		Regexp          string
+		Text            string
+		FindAllSubmatch bool
+	}{}
 
-	err := req.ParseForm()
+	err := json.NewDecoder(req.Body).Decode(&inputData)
 	if err != nil {
-		ctx.Errorf("Error parsing form: %v", err)
-		http.Error(rw, "Error parsing form", http.StatusInternalServerError)
+		ctx.Errorf("Error parsing input: %v", err)
+		http.Error(rw, "Error parsing input", http.StatusInternalServerError)
 		return
 	}
-	regexpString := req.FormValue("regexp")
-	testString := req.FormValue("testString")
-	findAllSubmatch, _ := strconv.ParseBool(req.FormValue("findAllSubmatch"))
-
-	//log.Printf("Regexp : %s", regexpString)
-	//log.Printf("Test string : %s", testString)
-	//log.Printf("Find all : %t", findAllSubmatch)
 
 	startRegex := time.Now()
 
-	m := &MatchResultResponse{}
-
-	r, err := regexp.Compile(regexpString)
+	r, err := regexp.Compile(inputData.Regexp)
 	if err != nil {
-		ctx.Errorf("Invalid RegExp : %s \n", regexpString)
-		http.Error(rw, fmt.Sprintf("Invalid RegExp : %s", regexpString), http.StatusInternalServerError)
+		ctx.Errorf("Invalid RegExp : %s \n", inputData.Regexp)
+		http.Error(rw, fmt.Sprintf("Invalid RegExp : %s", inputData.Regexp), http.StatusInternalServerError)
 		return
 	}
 
-	if findAllSubmatch {
-		matches = r.FindAllStringSubmatch(testString, -1)
-	} else {
-		matches = [][]string{r.FindStringSubmatch(testString)}
+	numMatches := -1
+	if !inputData.FindAllSubmatch {
+		numMatches = 1
 	}
+	matches := r.FindAllStringSubmatch(inputData.Text, numMatches)
 
-	//log.Println(matches)
-
+	m := &MatchResultResponse{}
 	if len(matches) > 0 {
 		m.Matches = matches
 		m.GroupsName = r.SubexpNames()[1:]
@@ -70,8 +63,8 @@ func regExpHandler(rw http.ResponseWriter, req *http.Request) {
 	regexDuration := time.Since(startRegex)
 	ctx.Infof("regex duration: %v", regexDuration)
 	stats := &RegexStats{
-		RegexLength:      len(regexpString),
-		TestStringLength: len(testString),
+		RegexLength:      len(inputData.Regexp),
+		TextStringLength: len(inputData.Text),
 		MatchDuration:    regexDuration,
 	}
 	writeStatsEntry(ctx, stats)
@@ -93,9 +86,9 @@ func writeStatsEntry(ctx appengine.Context, stats *RegexStats) {
 }
 
 func init() {
-	// Main handler (index.html)
-	http.Handle("/", http.RedirectHandler("/assets/html/index.html", http.StatusMovedPermanently))
-
 	// Regex testing service
 	http.HandleFunc("/test_regexp/", regExpHandler)
+
+	// Main handler (index.html)
+	http.Handle("/", http.RedirectHandler("/assets/html/index.html", http.StatusMovedPermanently))
 }
