@@ -2,9 +2,9 @@
 <html ng-app="regoApp">
 <head>
   <meta charset="utf-8">
-    <title>Rego - A Go regular expression tester</title>
+    <title>Regex Golang - A Go regular expression online tester</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Regex Golang - A Go regular expression tester">
+    <meta name="description" content="Regex Golang - A Go regular expression online tester">
     <meta name="author" content="Luke Mauldin">
 
   <!-- CSS -->
@@ -67,6 +67,18 @@
   <link rel="apple-touch-icon-precomposed" sizes="114x114" href="/assets/ico/apple-touch-icon-114-precomposed.png">
   <link rel="apple-touch-icon-precomposed" sizes="72x72" href="/assets/ico/apple-touch-icon-72-precomposed.png">
   <link rel="apple-touch-icon-precomposed" href="/assets/ico/apple-touch-icon-57-precomposed.png">
+
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-53939402-1', 'auto');
+  ga('send', 'pageview');
+
+</script>
 </head>
 <body ng-controller="mainCtrl">
   <!-- Part 1: Wrap all page content here -->
@@ -75,7 +87,7 @@
     <div class="container">
       <div class="page-header">
         <h1>Regex - Golang</h1>
-        A <a href="http://golang.org" target="_blank"/>Go</a> regular expression tester
+        A <a href="http://golang.org" target="_blank">Go</a> regular expression tester
       </div>
       <div class="row">
         <form id="regexpForm" action="/test_regexp" method="POST" class="col-md-6">
@@ -279,16 +291,6 @@
      <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.3.0-beta.18/angular.min.js"></script>
   <script type="text/javascript" src="/assets/js/rego.js"></script>
 
-<script>
-  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
-
-  ga('create', 'UA-53939402-1', 'auto');
-  ga('send', 'pageview');
-
-</script>
 
 </body>
 </html>
