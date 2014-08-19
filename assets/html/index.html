@@ -80,13 +80,13 @@
       <div class="row">
         <form id="regexpForm" action="/test_regexp" method="POST" class="col-md-6">
           <label>Your regular expression :</label>
-          <input id="regexpInput" ng-model="regexpInput" ng-keyup="evaluateRegex()" type="text" value="r([a-z]+)go" />
+          <input id="regexpInput" ng-model="regexpInput"  type="text" value="r([a-z]+)go" />
 
           <label>Test string :</label>
-          <textarea id="testStringInput" ng-model="stringInput" ng-keyup="evaluateRegex()" rows="5" cols="20" placeholder="rego">rego</textarea>
+          <textarea id="testStringInput" ng-model="stringInput" rows="5" cols="20" placeholder="rego">rego</textarea>
 
           <label class="checkbox">
-            <input id="findAllSubmatchCheckbox" ng-model="findAllSubmatch" ng-change="evaluateRegex()" type="checkbox" ng-true-value="true" ng-false-value="false"> Find all submatch
+            <input id="findAllSubmatchCheckbox" ng-model="findAllSubmatch" type="checkbox" ng-true-value="true" ng-false-value="false"> Find all submatch
           </label>
 
           <button id="clearAllFieldsButton" class="btn btn-warning" type="button">Clear all fields</button>
@@ -95,7 +95,7 @@
           <label>Match :</label>
           <div id="match" class="well">
               <div ng-show="error !== ''">
-                  <span class="danger">{{ error }}</span>
+                  <span class="text-danger">{{ error }}</span>
               </div>
               <div ng-show="error === ''">
                   <span style="color: green">{{ matchResult }}</span>

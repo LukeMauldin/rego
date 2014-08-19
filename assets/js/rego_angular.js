@@ -7,26 +7,22 @@
 
     //Create controller
     regoApp.controller('mainCtrl', ['$scope', '$http', '$location', function($scope, $http, $location) {
+        //Create emtpy matches
+        $scope.matches = [];
+
         //Set default text
         $scope.regexpInput = 'r([a-z]+)go';
         $scope.stringInput = 'rego';
         $scope.findAllSubmatch = 'true';
 
-        //Create emtpy matches
-        $scope.matches = [];
-//        $scope.matches = [
- //           {count: '0', 'groupName': '-', 'matchText': 'a match'}
-   //     ];
-
-
-
-        $scope.evaluateRegex = function() {
+        $scope.clearMatchResults = function() {
             //Clear all match output
             $scope.error = '';
             $scope.matches = [];
             $scope.matchResult = '';
+        };
 
-
+        $scope.evaluateRegex = function() {
             //Retrieve updated regexp information
             var postData = {
                 Regexp: $scope.regexpInput,
@@ -36,6 +32,10 @@
             var uri = $location.protocol() + "://" + $location.host() + ":" + $location.port() + "/test_regexp/";
             $http.post(uri,  postData)
                 .success(function(data) {
+                    //Clear results
+                    $scope.clearMatchResults();
+
+                    //Populate new results
                     var fullMatches = [];
                     for (var i = 0; i < data.matches.length; i++) {
                         var match = data.matches[i];
@@ -56,9 +56,18 @@
                     $scope.matchResult = fullMatches.join(" ");
                 })
                 .error(function(data) {
+                    //Clear results
+                    $scope.clearMatchResults();
+
+                    //Populate error
                     $scope.error = data;
                 });
         };
+
+        //Watch for changes
+        $scope.$watch('regexpInput', $scope.evaluateRegex);
+        $scope.$watch('stringInput', $scope.evaluateRegex);
+        $scope.$watch('findAllSubmatch', $scope.evaluateRegex);
 
         //Invoke evaluateRegex to display initial data to user
         $scope.evaluateRegex();
