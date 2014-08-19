@@ -1,122 +1,88 @@
-// jQuery form oninput wrapper
-// Thx to Mathias Bynens https://github.com/mathiasbynens/jquery-oninput
-jQuery.fn.input=function(a){var b=this;return a?b.bind({'input.input':function(c){b.unbind('keydown.input');a.call(this,c)},'keydown.input':function(c){a.call(this,c)}}):b.trigger('keydown.input')};
+(function() {
 
-$(document).ready(function() {
-    "use strict";
-  var testRegexTimeout;
+    'use strict';
 
-  function testRegex () {
-    $.ajax({
-      type: "POST",
-        url: "/test_regexp/",
-      data: {
-        regexp: $("#regexpInput").val(),
-        testString: $("#testStringInput").val(),
-        findAllSubmatch: $("#findAllSubmatchCheckbox").is(":checked")
-      }
-    }).done(function(msg) {
-      var res = $.parseJSON(msg);
-      var allMatches = res.matches;
-      var groupsName = res.groupsName;
+    //Create application
+    var regoApp = angular.module('regoApp', []);
 
-      // We clear previous results
-      clearResults();
+    //Create controller
+    regoApp.controller('mainCtrl', ['$scope', '$http', '$location', function($scope, $http, $location) {
+        //Create emtpy matches
+        $scope.matches = [];
 
-      if (allMatches && allMatches[0] !== null)
-      {
-        var l = allMatches.length;
+        //Set default text
+        $scope.regexpInput = 'r([a-z]+)go';
+        $scope.stringInput = 'rego';
+        $scope.findAllSubmatch = true;
 
-        // Match font color > green
-        $("#match").css("color", "green");
+        $scope.clearMatchResults = function() {
+            //Clear all match output
+            $scope.error = '';
+            $scope.matches = [];
+            $scope.matchResult = '';
+        };
 
-        // Match groups
-        if (l > 0)
-        {
-          var match = [];
-          var matchGroupsTable = [];
-          var index = 0;
+        $scope.clearAllFields = function() {
+            $scope.regexpInput = '';
+            $scope.stringInput = '';
+            $scope.findAllSubmatch = true;
+            $scope.clearMatchResults();
+        };
 
-          for (var i = 0; i < l; i++)
-          {
-            var matches = allMatches[i];
-            var m = matches.length;
+        $scope.evaluateRegex = function() {
+            //Retrieve updated regexp information
+            var postData = {
+                Regexp: $scope.regexpInput,
+                Text: $scope.stringInput,
+                FindAllSubmatch: $scope.findAllSubmatch === 'true' || $scope.findAllSubmatch === true,
+            };
+            var uri = $location.protocol() + "://" + $location.host() + ":" + $location.port() + "/test_regexp/";
+            $http.post(uri,  postData)
+                .success(function(data) {
+                    //Clear results
+                    $scope.clearMatchResults();
 
-            match.push(matches[0]);
-            for (var j = 1; j < m; j++)
-            {
-              matchGroupsTable.push('<tr><td>'+(index++)+'</td><td>'+((groupsName[j-1] !== "") ? groupsName[j-1] : "-")+'</td><td>'+escapeHTML(matches[j])+'</td></tr>');
-            }
-          }
+                    //Check for results
+                    if (data.matches === null) {
+                        return;
+                    }
 
-          $("#match").html(escapeHTML(match.join(" ")));
-          $('#matchGroupsTable > tbody:last').append(matchGroupsTable.join());
-        }
+                    //Populate new results
+                    var fullMatches = [];
+                    for (var i = 0; i < data.matches.length; i++) {
+                        var match = data.matches[i];
 
-      }
-      else
-      {
-        $("#match").html("No match !");
-        $("#match").css("color", "red");
-      }
+                        //Populate fullMatches list
+                        fullMatches[i] = match[0];
 
-    }).error(function(error) {
-      $("#match").html(error.responseText);
-      $("#match").css("color", "red");
-    });
-  }
+                        for (var j = 1; j < match.length; j++) {
+                            //Populate matches list
+                            var groupName = data.groupsName.length >= j && data.groupsName[j - 1] !== '' ? data.groupsName[j - 1] : '-';
+                            $scope.matches[j] ={
+                                    count: j,
+                                    groupName: groupName,
+                                    matchText: match[j]
+                            };
+                        }
+                    }
+                    $scope.matchResult = fullMatches.join(" ");
+                })
+                .error(function(data) {
+                    //Clear results
+                    $scope.clearMatchResults();
 
-  function clear() {
-    $("#regexpInput").val("");
-    $("#testStringInput").val("");
+                    //Populate error
+                    $scope.error = data;
+                });
+        };
 
-    // Remove placeholder
-    $("#regexpInput").attr("placeholder", "");
-    $("#testStringInput").attr("placeholder", "");
+        //Watch for changes
+        $scope.$watch('regexpInput', $scope.evaluateRegex);
+        $scope.$watch('stringInput', $scope.evaluateRegex);
+        $scope.$watch('findAllSubmatch', $scope.evaluateRegex);
 
-    clearResults();
-  }
+        //Invoke evaluateRegex to display initial data to user
+        $scope.evaluateRegex();
+    }]);
 
-  function clearResults() {
-    // Empty match groups table
-    $("#matchGroupsTable tbody > tr").remove();
-
-    $("#match").html("");
-  }
-
-  function escapeHTML(str) {
-    var div = document.createElement('div');
-    div.appendChild(document.createTextNode(str));
-    return div.innerHTML;
-  }
-
-  //
-  // Add Handlers
-  //
-  $("#regexpForm").submit(function() {
-    testRegex();
-
-    return false;
-  });
-
-  $("#regexpForm").input(function() {
-
-    if (testRegexTimeout)
-      clearTimeout(testRegexTimeout);
-
-    testRegexTimeout = setTimeout(testRegex, 750);
-  });
-
-  $("#findAllSubmatchCheckbox").click(function() {
-    testRegex();
-    });
-
-  $("#clearAllFieldsButton").click(function() {
-    clear();
-  });
-
-
-  // Test sample regexp
-  testRegex();
-
-});
+})();
