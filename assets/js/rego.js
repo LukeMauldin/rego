@@ -58,8 +58,8 @@
                         for (var j = 1; j < match.length; j++) {
                             //Populate matches list
                             var groupName = data.groupsName.length >= j && data.groupsName[j - 1] !== '' ? data.groupsName[j - 1] : '-';
-                            $scope.matches[j] ={
-                                    count: j,
+                            $scope.matches[j - 1] ={
+                                    count: j - 1,
                                     groupName: groupName,
                                     matchText: match[j]
                             };
@@ -75,7 +75,7 @@
                     $scope.error = data;
                 });
         };
-        
+
         //Invoke evaluateRegex to display initial data to user
         $scope.evaluateRegex();
     }]);

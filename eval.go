@@ -34,10 +34,10 @@ func EvalRegex(ctx appengine.Context, expr string, text string, numMatches int) 
 }
 
 type regexStats struct {
-	ExprLength int
-	TextLength int
-	RanAt      time.Time
-	Duration   time.Duration
+	ExprLength int           `datastore:",noindex"`
+	TextLength int           `datastore:",noindex"`
+	RanAt      time.Time     `datastore:",noindex"`
+	Duration   time.Duration `datastore:",noindex"`
 }
 
 func recordStats(ctx appengine.Context, expr string, text string, duration time.Duration) {
