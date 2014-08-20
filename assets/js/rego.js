@@ -3,10 +3,10 @@
     'use strict';
 
     //Create application
-    var regoApp = angular.module('regoApp', []);
+    var regoApp = angular.module('regoApp', ['ui.bootstrap']);
 
     //Create controller
-    regoApp.controller('mainCtrl', ['$scope', '$http', '$location', function($scope, $http, $location) {
+    regoApp.controller('mainCtrl', ['$scope', '$http', '$location', '$modal', function($scope, $http, $location, $modal) {
         //Create emtpy matches
         $scope.matches = [];
 
@@ -32,12 +32,12 @@
         $scope.evaluateRegex = function() {
             //Retrieve updated regexp information
             var postData = {
-                Regexp: $scope.regexpInput,
+                Expr: $scope.regexpInput,
                 Text: $scope.stringInput,
-                FindAllSubmatch: $scope.findAllSubmatch === 'true' || $scope.findAllSubmatch === true,
+                NumMatches: $scope.findAllSubmatch === 'true' || $scope.findAllSubmatch === true ? -1 : 1,
             };
-            var uri = $location.protocol() + "://" + $location.host() + ":" + $location.port() + "/test_regexp/";
-            $http.post(uri,  postData)
+            var uri = $scope.getBaseUrl() + "/eval_regexp/";
+            $http.post(uri, postData)
                 .success(function(data) {
                     //Clear results
                     $scope.clearMatchResults();
@@ -76,8 +76,56 @@
                 });
         };
 
+        $scope.shareRegex = function() {
+            var postData = {
+                Expr: $scope.regexpInput,
+                Text: $scope.stringInput,
+                NumMatches: $scope.findAllSubmatch === 'true' || $scope.findAllSubmatch === true ? -1 : 1,
+            };
+            var uri = $scope.getBaseUrl() + "/share_regexp/";
+            $http.post(uri, postData)
+            .success(function(data) {
+                $modal.open({
+                    templateUrl: 'shareModalContent.html',
+                    controller: 'shareModalCtrl',
+                    size: 'sm',
+                    resolve: {
+                        'shareUrl': function () {
+                            return $scope.getBaseUrl() + "/load_regexp?key=" + data;
+                        }
+                    }
+                });
+            })
+            .error(function(data) {
+                $modal.open({
+                    templateUrl: 'errorModalContent.html',
+                    controller: 'errorModalCtrl',
+                    resolve: {
+                        'error': function () {
+                            return data;
+                        }
+                    }
+                });
+            });
+        };
+
+        $scope.getBaseUrl = function() {
+            return $location.protocol() + "://" + $location.host() + ":" + $location.port();
+        };
+
         //Invoke evaluateRegex to display initial data to user
         $scope.evaluateRegex();
+    }]);
+
+
+    //Create share modal controller
+    regoApp.controller('shareModalCtrl', ['$scope', 'shareUrl', function($scope, shareUrl) {
+        $scope.shareUrl = shareUrl;
+    }]);
+
+    //Create error modal controller
+    regoApp.controller('errorModalCtrl', ['$scope', 'error', function($scope, error) {
+        $scope.error = error;
     }]);
 
 })();

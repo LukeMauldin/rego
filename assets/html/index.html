@@ -59,6 +59,7 @@
           </label>
 
           <button id="clearAllFieldsButton" class="btn btn-warning" type="button" ng-click="clearAllFields()">Clear all fields</button>
+          <button class="btn" type="button" ng-click="shareRegex()">Share</button>
         </form>
         <form class="col-md-6">
           <label>Match :</label>
@@ -246,11 +247,37 @@
     </div>
   </div>
 
+  <script type="text/ng-template" id="shareModalContent.html">
+    <div class="model-header">
+        <h3 class="model-title">Share Regexp</h3>
+    </div>
+    <div class="model-body">
+        Share URL: <a href="{{ shareUrl}}"> {{ shareUrl}} </a>
+    </div>
+    <div class="model-footer">
+        <button class="btn btn-primary" ng-click="$close(result)">Close</button>
+    </div>
+  </script>
+
+  <script type="text/ng-template" id="errorModalContent.html">
+    <div class="model-header">
+        <h3 class="model-title">Error</h3>
+    </div>
+    <div class="model-body">
+        <span ng-bind="error"></span>
+    </div>
+    <div class="model-footer">
+        <button class="btn btn-primary" ng-click="$close(result)">Close</button>
+    </div>
+  </script>
+
+
 
   <!-- Le javascript
     ================================================== -->
     <!-- Placed at the end of the document so the pages load faster -->
      <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.3.0-beta.18/angular.min.js"></script>
+     <script src="//cdnjs.cloudflare.com/ajax/libs/angular-ui-bootstrap/0.10.0/ui-bootstrap-tpls.js"></script>
   <script type="text/javascript" src="/assets/js/rego.js"></script>
 
 

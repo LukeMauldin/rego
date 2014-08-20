@@ -10,17 +10,17 @@ import (
 	"appengine/datastore"
 )
 
-func EvalRegex(ctx appengine.Context, expr string, text string, numMatches int) (*MatchResultResponse, error) {
+func EvalRegex(ctx appengine.Context, input *MatchInput) (*MatchResultResponse, error) {
 	startRegex := time.Now()
 
 	//Compile regex
-	r, err := regexp.Compile(expr)
+	r, err := regexp.Compile(input.Expr)
 	if err != nil {
-		return nil, fmt.Errorf("Invalid RegExp: %s -- %v", expr, err)
+		return nil, fmt.Errorf("Invalid RegExp: %s -- %v", input.Expr, err)
 	}
 
 	//Evaluate regex and get results
-	matches := r.FindAllStringSubmatch(text, numMatches)
+	matches := r.FindAllStringSubmatch(input.Text, input.NumMatches)
 	result := &MatchResultResponse{}
 	if len(matches) > 0 {
 		result.Matches = matches
@@ -28,7 +28,7 @@ func EvalRegex(ctx appengine.Context, expr string, text string, numMatches int) 
 	}
 
 	//Record stats
-	go recordStats(ctx, expr, text, time.Since(startRegex))
+	go recordStats(ctx, input.Expr, input.Text, time.Since(startRegex))
 
 	return result, nil
 }
